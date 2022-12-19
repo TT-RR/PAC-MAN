@@ -1,0 +1,187 @@
+/* CやC++などシェルに実行結果コード返却を明示する言語を利用する場合 基本的に0を返却してください。 */
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#define stageArray_count 10//変数の要素数
+int main()
+{
+    int i, j;
+    int keep_i = 1, keep_j = 7;//一回前の座標を保持する
+    int play_i = 1, play_j = 7;//●を移動させた座標
+    int direction;  //方向
+    int flag = 0; //移動先が■か□なら立つ
+    int score = 0;//※を取ることによって増える点数
+    int special = 0;//★を取った後の状態
+    
+    int stageArray[10][10] = { { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
+    , { 4, 0, 0, 0, 0, 0, 0, 0, 0, 4 }
+    , { 4, 0, 1, 1, 1, 1, 1, 2, 0, 4 }
+    , { 4, 0, 0, 1, 0, 3, 1, 0, 0, 4 }
+    , { 4, 1, 1, 1, 0, 1, 1, 2, 0, 4 }
+    , { 4, 0, 5, 1, 0, 0, 0, 0, 0, 4 }
+    , { 4, 0, 1, 1, 0, 1, 1, 1, 0, 4 }
+    , { 4, 0, 0, 1, 0, 1, 2, 1, 0, 4 }
+    , { 4, 0, 0, 0, 0, 0, 0, 0, 0, 4 }
+    , { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 } };
+    printf("Score:%d\n", score);    //スコアの表示
+    
+    for (i = 0; i < stageArray_count; i++) {    //縦
+        for (j = 0; j < stageArray_count; j++) {    //横
+            if (i == keep_i && j == keep_j) {
+                printf("●");
+            }
+            else {
+                switch (stageArray[i][j]) {
+                case 0:
+                    printf("　");
+                    break;
+                case 1:
+                    printf("□");
+                    break;
+                case 2:
+                    printf("※");
+                    break;
+                case 3:
+                    printf("★");
+                    break;
+                case 4:
+                    printf("■");
+                    break;
+                case 5:
+                    printf("Ｇ");
+                    break;
+                default:
+                    ;
+                }
+            }
+        }
+        printf("\n");
+    }
+
+    while (stageArray[keep_i][keep_j] != 5) {
+        printf("進行方向　１：↑　２：←　３：→　４：↓　入力：\n");
+        scanf("%d", &direction);
+        flag = 0;
+
+        switch (direction) {
+        case 1:
+            --play_i;
+            break;
+        case 2:
+            --play_j;
+            break;
+        case 3:
+            ++play_j;
+            break;
+        case 4:
+            ++play_i;
+            break;
+        default:
+            ;
+        }
+
+        //★の座標になったら
+        if (stageArray[play_i][play_j] == 3) {
+            special = 1;
+            stageArray[play_i][play_j] = 0;
+        }
+
+        //※の座標になったら
+        else if (stageArray[play_i][play_j] == 2) {
+            score = score + 100;
+            //※とったら表示させない
+            stageArray[play_i][play_j] = 0;
+        }
+
+        //●の状態で移動先が■又は□
+        if (special == 0) {
+            if(stageArray[play_i][play_j] == 4 || stageArray[play_i][play_j] == 1){
+                flag = 1;
+            }
+        }
+        //◎なら
+        else if (special == 1) {
+            
+            //移動先が■なら
+            if (stageArray[play_i][play_j] == 4) {
+                flag = 1;
+            }
+            //移動先が□なら
+            else if(stageArray[play_i][play_j] == 1) {
+                flag = 0;
+                //表示させない
+                stageArray[play_i][play_j] = 0;
+            }
+        }
+
+        
+
+        printf("Score:%d\n", score);    //スコアの表示
+        for (i = 0; i < stageArray_count; i++) {    //縦
+            for (j = 0; j < stageArray_count; j++) {    //横
+
+                //移動先が■の時
+                if (i == keep_i && j == keep_j && flag == 1) {
+                    //◎なら
+                    if (special == 1) {
+                        printf("◎");
+                    }
+                    //●なら
+                    else if(special==0){
+                        printf("●");
+                    }
+                }
+
+                //移動先が普通&□
+                else if (i == play_i && j == play_j && flag == 0){
+                    //◎なら
+                    if (special == 1) {
+                        printf("◎");
+                        keep_i = play_i;
+                        keep_j = play_j;
+                    }
+                    //●なら
+                    else if (special == 0) {
+                        printf("●");
+                        keep_i = play_i;
+                        keep_j = play_j;
+                    }
+                }
+                
+                else{
+                    switch (stageArray[i][j]) {
+                    case 0:
+                        printf("　");
+                        break;
+                    case 1:
+                        printf("□");
+                        break;
+                    case 2:
+                        printf("※");
+                        break;
+                    case 3:
+                        printf("★");
+                        break;
+                    case 4:
+                        printf("■");
+                        break;
+                    case 5:
+                        printf("Ｇ");
+                        break;
+                    default:
+                        ;
+                    }
+                }
+            }
+            printf("\n");
+        }
+        if (direction > 4) {
+            printf("Error01\n");
+        }
+        else if (flag == 1) {
+            printf("Error02\n");
+            play_i = keep_i;
+            play_j = keep_j;
+        }
+    }
+    printf("ゴール\n");
+}
